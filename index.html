@@ -174,18 +174,18 @@
             drawPoints(FourierValues);
             slider.max = FourierValues.length;
             slider.value = FourierValues.length;
-            sliderValue.innerHTML = (`${slider.value} circles`)
+            sliderValue.innerHTML = (`${slider.value-1} circles`)
             slider.oninput = function () {
                 clearCanvas()
                 drawBezier(points, "black")
                 drawBezier(fourierDraw(FourierCoefficients, this.value), "blue")
-                sliderValue.innerHTML = (`${this.value} circles`)
+                sliderValue.innerHTML = (`${this.value-1} circles`)
             }
             slider.oninput = function () {
                 clearCanvas()
                 drawBezier(points, "black")
                 drawBezier(fourierDraw(FourierCoefficients, this.value), "blue")
-                sliderValue.innerHTML = (`${this.value} circles`)
+                sliderValue.innerHTML = (`${this.value-1} circles`)
             }
         }
 
