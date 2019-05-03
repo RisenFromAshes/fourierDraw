@@ -9,13 +9,15 @@
     </head>
 
     <body>
-        <div id="container" style="border: 2px solid; width: 99vw; height: 80vh; cursor: crosshair;">
-            <canvas id="canvas"></canvas>
+        <div id="container" style="border: 2px solid; width: 95vw; height: 80vh; cursor: crosshair; margin-left: 2vw;">
+            <canvas id="canvas2" style="position:absolute"></canvas>
+            <canvas id="canvas" style="position:absolute"></canvas>
         </div>
     </body>
     <button onclick="clearStuffs()">Clear Shits</button>
     <button onclick="listFourier()">Calculate Fourier Coefficients</button>
     <button onclick="listFourierValues()">Fourier Values</button>
+    <button onclick="drawCircles()">Nothing</button>
     <div class="slidecontainer">
         <p>Precision</p>
         <input type="range" min="0" max="100" value="100" class="slider" id="slider" style="width:80vw">
@@ -29,8 +31,13 @@
         var c = document.getElementById("canvas");
         c.width = parseInt(getComputedStyle(container).width.replace("px", ""));
         c.height = parseInt(getComputedStyle(container).height.replace("px", ""));
-        console.log(c.width, c.height);
         var ctx = c.getContext("2d");
+        var boundingRect = c.getBoundingClientRect();
+        var c2 = document.getElementById("canvas2");
+        c2.width = c.width;
+        c2.height = c.height;
+        var ctx2 = c2.getContext("2d");
+
         var initialPos;
         var points = [];
 
@@ -45,36 +52,44 @@
         var FourierCoefficients = [],
             FourierValues = [];
         var prevPoint, nowPoint;
+        var mouseClicked = false
         c.onmousedown = function (e) {
             clearStuffs();
+            mouseClicked = true
             ctx.lineWidth = 3;
             console.log(e)
-            initialPos = new point(e.x || e.touches[0].clientX, e.y || e.touches[0].clientY);
+            initialPos = new point((e.x) ? (e.pageX - boundingRect.left) : (e.touches[0].pageX - boundingRect
+                .left), (e.y) ? (e.pageY - boundingRect.top) : (e.touches[0].pageY - boundingRect
+                .left));
             points.push(initialPos);
             ctx.lineStyle = "#000";
-            ctx.moveTo(e.x || e.touches[0].clientX, e.y || e.touches[0].clientY);
+            ctx.moveTo(initialPos.x, initialPos.y);
         };
         c.onmousemove = function (e) {
-            ctx.lineTo(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
-            if (!prevPoint) prevPoint = initialPos;
-            newPoint = new point(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
-            var distance = Math.hypot(prevPoint.x - newPoint.x, prevPoint.y - newPoint.y)
-            if (distance > 10) {
-                points.push(newPoint);
-                prevPoint = newPoint;
+            if (mouseClicked) {
+                newPoint = new point((e.pageX) ? (e.pageX - boundingRect.left) : (e.touches[0].pageX - boundingRect
+                    .left), (e.pageY) ? (e.pageY - boundingRect.top) : (e.touches[0].pageY - boundingRect
+                    .left));
+                ctx.lineTo(newPoint.x, newPoint.y);
+                if (!prevPoint) prevPoint = initialPos;
+                var distance = Math.hypot(prevPoint.x - newPoint.x, prevPoint.y - newPoint.y)
+                if (distance > 10) {
+                    points.push(newPoint);
+                    prevPoint = newPoint;
+                }
+                ctx.stroke();
             }
-            ctx.stroke();
         };
         c.ontouchstart = c.onmousedown;
         c.ontouchmove = c.onmousemove;
         c.onmouseup = function (e) {
-            c.onmousemove = () => {};
             points.push(initialPos);
             ctx.stroke();
             ctx.closePath();
             clearCanvas();
             drawBezier(points, "black")
             listValues(points);
+            mouseClicked = false
         };
         c.ontouchend = c.onmouseup;
 
@@ -172,6 +187,37 @@
             }
         }
 
+        // function drawCircles(precisionCount) {
+        //     for (var j = 0; j < FourierCoefficients.length; j++) {
+        //         for (var i = 0; i < (precisionCount); i++) {
+        //             if (i % 2 == 0)
+        //                 k = i / 2;
+        //             else k = N - Math.ceil(i / 2)
+        //             var theta = (2 * Math.PI * k * j) / N;
+        //             Re_NF_j +=
+        //                 Math.cos(theta) * fourierCoefficients[k].Re -
+        //                 Math.sin(theta) * fourierCoefficients[k].Im;
+        //             Im_NF_j +=
+        //                 Math.cos(theta) * fourierCoefficients[k].Im +
+        //                 Math.sin(theta) * fourierCoefficients[k].Re;
+        //         }
+        //         fourierValues.push(new point(Re_NF_j, Im_NF_j));
+        //         if (j == 0) {
+        //             firstx = Re_NF_j;
+        //             firsty = Im_NF_j;
+        //         }
+        //     }
+        // }
+
+        function drawCircles() {
+            var i = 0;
+            ctx2.beginPath()
+            ctx2.clearRect(0, 0, c2.width, c2.height)
+            ctx2.arc(FourierCoefficients[0].Re, FourierCoefficients[0].Im, Math.hypot(FourierCoefficients[1].Re,
+                FourierCoefficients[1].Im), 0, 2 * Math.PI)
+            ctx2.stroke()
+            i++;
+        }
 
         function drawPoints(pointArr, color) {
             ctx.strokeStyle = color || "blue";
