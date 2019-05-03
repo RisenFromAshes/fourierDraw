@@ -17,21 +17,25 @@
     <button onclick="clearStuffs()">Clear Shits</button>
     <button onclick="listFourier()">Calculate Fourier Coefficients</button>
     <button onclick="listFourierValues()">Fourier Values</button>
-    <button onclick="drawCircles()">Nothing</button>
     <label>
         Animate Circles
         <input type="checkbox" checked="false" id="checkBox" style="width:1.5vw; height:1.5vw">
     </label>
     <div class="slidecontainer">
         <p>Precision</p>
-        <input type="range" min="0" max="100" value="100" class="slider" id="slider" style="width:80vw">
+        <input type="range" min="0" max="100" value="100" id="slider" style="width:80vw">
         <div id="cValue">n circles</div>
+        <p>Speed Multiplier</p>
+        <input type="range" min="1" max="1000" value="200" id="slider2" style="width:80vw">
+        <div id="sValue">w = 0.02</div>
     </div>
     <table id="table"></table>
     <script>
         var container = document.getElementById("container");
         var slider = document.getElementById("slider");
         var sliderValue = document.getElementById("cValue");
+        var slider2 = document.getElementById("slider2");
+        var slider2Value = document.getElementById("sValue");
         var checkBox = document.getElementById("checkBox")
         checkBox.checked = false
         var c = document.getElementById("canvas");
@@ -185,7 +189,7 @@
             FourierValues = fourierDraw(FourierCoefficients);
             listValues(FourierValues);
             drawPoints(FourierValues);
-            slider.max = FourierValues.length;
+            slider.max = FourierValues.length - 1;
             slider.value = FourierValues.length;
             sliderValue.innerHTML = (`${slider.value-1} circles`)
             slider.oninput = function () {
@@ -296,6 +300,12 @@
                 drawCircles(slider.value)
             } else checkBox.checked = false
         }
+        slider2.oninput = function () {
+            w = this.value / 1000;
+            drawCircles(slider.value)
+            slider2Value.innerHTML = `w = ${w}`
+        }
+        slider2.onchange = slider2.oninput
 
         function drawPoints(pointArr, color) {
             ctx.strokeStyle = color || "blue";
