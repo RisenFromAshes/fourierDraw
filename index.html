@@ -18,8 +18,8 @@
     <button onclick="listFourierValues()">Fourier Values</button>
     <div class="slidecontainer">
         <p>Precision</p>
-        <input type="range" min="1" max="100" value="100" class="slider" id="slider" style="width:80vw">
-        <div id="cValue"></div>
+        <input type="range" min="0" max="100" value="100" class="slider" id="slider" style="width:80vw">
+        <div id="cValue">n circles</div>
     </div>
     <table id="table"></table>
     <script>
@@ -119,35 +119,26 @@
                     `<tr><td>${i + 1}</td><td>${fourierCoefficients[i].Re}</td><td>${fourierCoefficients[i].Im}</td></tr>`;
         }
 
-        function fourierDraw(fourierCoefficients, Precision) {
-            var precision = Precision || 1;
+        function fourierDraw(fourierCoefficients, PrecisionCount) {
             var fourierValues = [];
             var N = fourierCoefficients.length;
+            var precisionCount = PrecisionCount || N;
             for (var j = 0; j < fourierCoefficients.length; j++) {
                 var Re_NF_j = 0,
                     Im_NF_j = 0,
                     firstx,
-                    firsty;
-                for (var i = 0; i < (fourierCoefficients.length * precision) / 2; i++) {
-                    var k = i;
-                    var theta;
-                    theta = (2 * Math.PI * k * j) / N;
+                    firsty, k;
+                for (var i = 0; i < (precisionCount); i++) {
+                    if (i % 2 == 0)
+                        k = i / 2;
+                    else k = N - Math.ceil(i / 2)
+                    var theta = (2 * Math.PI * k * j) / N;
                     Re_NF_j +=
                         Math.cos(theta) * fourierCoefficients[k].Re -
                         Math.sin(theta) * fourierCoefficients[k].Im;
                     Im_NF_j +=
                         Math.cos(theta) * fourierCoefficients[k].Im +
                         Math.sin(theta) * fourierCoefficients[k].Re;
-                    if (i > 0) {
-                        k = N - i;
-                        theta = (2 * Math.PI * k * j) / N;
-                        Re_NF_j +=
-                            Math.cos(theta) * fourierCoefficients[k].Re -
-                            Math.sin(theta) * fourierCoefficients[k].Im;
-                        Im_NF_j +=
-                            Math.cos(theta) * fourierCoefficients[k].Im +
-                            Math.sin(theta) * fourierCoefficients[k].Re;
-                    }
                 }
                 fourierValues.push(new point(Re_NF_j, Im_NF_j));
                 if (j == 0) {
@@ -164,19 +155,24 @@
             FourierValues = fourierDraw(FourierCoefficients);
             listValues(FourierValues);
             drawPoints(FourierValues);
+            slider.max = FourierValues.length;
+            slider.value = FourierValues.length;
+            sliderValue.innerHTML = (`${slider.value} circles`)
             slider.oninput = function () {
                 clearCanvas()
                 drawBezier(points, "black")
-                drawBezier(fourierDraw(FourierCoefficients, this.value / 100), "blue")
-                sliderValue.innerHTML = (`${this.value}%`)
+                drawBezier(fourierDraw(FourierCoefficients, this.value), "blue")
+                sliderValue.innerHTML = (`${this.value} circles`)
             }
             slider.oninput = function () {
                 clearCanvas()
                 drawBezier(points, "black")
-                drawBezier(fourierDraw(FourierCoefficients, this.value / 100), "blue")
-                sliderValue.innerHTML = (`${this.value}%`)
+                drawBezier(fourierDraw(FourierCoefficients, this.value), "blue")
+                sliderValue.innerHTML = (`${this.value} circles`)
             }
         }
+
+        function drawCircles() {}
 
         function drawPoints(pointArr, color) {
             ctx.strokeStyle = color || "blue";
