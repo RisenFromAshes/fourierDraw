@@ -266,12 +266,14 @@
                     ctx2.beginPath()
                     ctx2.moveTo(circlePoint1.x + radius, circlePoint1.y)
                     ctx2.strokeStyle = "#5099FF"
+                    ctx2.lineWidth = 2
                     ctx2.arc(circlePoint1.x, circlePoint1.y, radius, 0, 2 * Math.PI)
                     ctx2.stroke()
                     ctx2.closePath()
                     ctx2.beginPath()
 
                     ctx2.strokeStyle = "#0047aa"
+                    ctx2.lineWidth = 1
                     ctx2.moveTo(circlePoint1.x, circlePoint1.y)
                     ctx2.lineTo(circlePoint2.x, circlePoint2.y)
                     ctx2.stroke()
