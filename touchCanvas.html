@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Document</title>
+    </head>
+
+    <body>
+        <div id="container" style="border: 2px solid; width: 99vw; height: 80vh; cursor: crosshair;">
+            <canvas id="canvas"></canvas>
+        </div>
+    </body>
+    <button onclick="clearStuffs()">Clear Shits</button>
+    <button onclick="listFourier()">Calculate Fourier Coefficients</button>
+    <button onclick="listFourierValues()">Fourier Values</button>
+    <div class="slidecontainer">
+        <p>Precision</p>
+        <input type="range" min="1" max="100" value="100" class="slider" id="slider" style="width:80vw">
+        <div id="cValue"></div>
+    </div>
+    <table id="table"></table>
+    <script>
+        var container = document.getElementById("container");
+        var slider = document.getElementById("slider");
+        var sliderValue = document.getElementById("cValue");
+        var c = document.getElementById("canvas");
+        c.width = parseInt(getComputedStyle(container).width.replace("px", ""));
+        c.height = parseInt(getComputedStyle(container).height.replace("px", ""));
+        console.log(c.width, c.height);
+        var ctx = c.getContext("2d");
+        var initialPos;
+        var points = [];
+
+        var point = function (x, y) {
+            this.x = x;
+            this.y = y;
+        };
+        var complexNumber = function (Re, Im) {
+            this.Re = Re;
+            this.Im = Im;
+        };
+        var FourierCoefficients = [],
+            FourierValues = [];
+        var prevPoint, nowPoint;
+        c.onmousedown = function (e) {
+            clearStuffs();
+            ctx.lineWidth = 3;
+            console.log(e)
+            initialPos = new point(e.x || e.touches[0].clientX, e.y || e.touches[0].clientY);
+            points.push(initialPos);
+            ctx.lineStyle = "#000";
+            ctx.moveTo(e.x || e.touches[0].clientX, e.y || e.touches[0].clientY);
+        };
+        c.onmousemove = function (e) {
+            ctx.lineTo(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
+            if (!prevPoint) prevPoint = initialPos;
+            newPoint = new point(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
+            var distance = Math.hypot(prevPoint.x - newPoint.x, prevPoint.y - newPoint.y)
+            if (distance > 10) {
+                points.push(newPoint);
+                prevPoint = newPoint;
+            }
+            ctx.stroke();
+        };
+        c.ontouchstart = c.onmousedown;
+        c.ontouchmove = c.onmousemove;
+        c.onmouseup = function (e) {
+            c.onmousemove = () => {};
+            points.push(initialPos);
+            ctx.stroke();
+            ctx.closePath();
+            clearCanvas();
+            drawBezier(points, "black")
+            listValues(points);
+        };
+        c.ontouchend = c.onmouseup;
+
+        function clearStuffs() {
+            points = [];
+            listValues(null);
+            ctx.beginPath();
+            ctx.clearRect(0, 0, c.width, c.height);
+        }
+
+        function clearCanvas() {
+            ctx.beginPath();
+            ctx.clearRect(0, 0, c.width, c.height);
+        }
+
+        function fourierTransform(pointArr) {
+            var fourierCoefficients = [];
+            var N = pointArr.length - 1;
+            for (var j = 0; j < pointArr.length - 1; j++) {
+                var Re_NF_j = 0,
+                    Im_NF_j = 0;
+                for (var k = 0; k < pointArr.length - 1; k++) {
+                    var theta = -(2 * Math.PI * k * j) / N;
+                    Re_NF_j +=
+                        Math.cos(theta) * pointArr[k].x - Math.sin(theta) * pointArr[k].y;
+                    Im_NF_j +=
+                        Math.cos(theta) * pointArr[k].y + Math.sin(theta) * pointArr[k].x;
+                }
+                fourierCoefficients.push(new complexNumber(Re_NF_j / N, Im_NF_j / N));
+            }
+            return fourierCoefficients;
+        }
+
+        function listFourier() {
+            var fourierCoefficients = fourierTransform(points);
+            FourierCoefficients = fourierCoefficients;
+            var table = document.getElementById("table");
+            table.innerHTML = `<thead><tr><td>Fourier Coefficients</td></tr></thead>`;
+            if (fourierCoefficients)
+                for (var i = 0; i < fourierCoefficients.length; i++)
+                    table.innerHTML +=
+                    `<tr><td>${i + 1}</td><td>${fourierCoefficients[i].Re}</td><td>${fourierCoefficients[i].Im}</td></tr>`;
+        }
+
+        function fourierDraw(fourierCoefficients, Precision) {
+            var precision = Precision || 1;
+            var fourierValues = [];
+            var N = fourierCoefficients.length;
+            for (var j = 0; j < fourierCoefficients.length; j++) {
+                var Re_NF_j = 0,
+                    Im_NF_j = 0,
+                    firstx,
+                    firsty;
+                for (var i = 0; i < (fourierCoefficients.length * precision) / 2; i++) {
+                    var k = i;
+                    var theta;
+                    theta = (2 * Math.PI * k * j) / N;
+                    Re_NF_j +=
+                        Math.cos(theta) * fourierCoefficients[k].Re -
+                        Math.sin(theta) * fourierCoefficients[k].Im;
+                    Im_NF_j +=
+                        Math.cos(theta) * fourierCoefficients[k].Im +
+                        Math.sin(theta) * fourierCoefficients[k].Re;
+                    if (i > 0) {
+                        k = N - i;
+                        theta = (2 * Math.PI * k * j) / N;
+                        Re_NF_j +=
+                            Math.cos(theta) * fourierCoefficients[k].Re -
+                            Math.sin(theta) * fourierCoefficients[k].Im;
+                        Im_NF_j +=
+                            Math.cos(theta) * fourierCoefficients[k].Im +
+                            Math.sin(theta) * fourierCoefficients[k].Re;
+                    }
+                }
+                fourierValues.push(new point(Re_NF_j, Im_NF_j));
+                if (j == 0) {
+                    firstx = Re_NF_j;
+                    firsty = Im_NF_j;
+                }
+            }
+            fourierValues.push(new point(firstx, firsty));
+            return fourierValues;
+        }
+
+        function listFourierValues() {
+            if (FourierCoefficients.length === 0) FourierCoefficients = fourierTransform(points)
+            FourierValues = fourierDraw(FourierCoefficients);
+            listValues(FourierValues);
+            drawPoints(FourierValues);
+            slider.oninput = function () {
+                clearCanvas()
+                drawBezier(points, "black")
+                drawBezier(fourierDraw(FourierCoefficients, this.value / 100), "blue")
+                sliderValue.innerHTML = (`${this.value}%`)
+            }
+            slider.oninput = function () {
+                clearCanvas()
+                drawBezier(points, "black")
+                drawBezier(fourierDraw(FourierCoefficients, this.value / 100), "blue")
+                sliderValue.innerHTML = (`${this.value}%`)
+            }
+        }
+
+        function drawPoints(pointArr, color) {
+            ctx.strokeStyle = color || "blue";
+            ctx.beginPath();
+            ctx.moveTo(pointArr[0].x, pointArr[0].y);
+            for (var i = 1; i < pointArr.length; i++) {
+                ctx.lineTo(pointArr[i].x, pointArr[i].y);
+            }
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function drawBezier(pointArr, color) {
+            ctx.strokeStyle = color || "blue";
+            ctx.beginPath();
+            ctx.moveTo(pointArr[0].x, pointArr[0].y);
+            for (var i = 0; i < pointArr.length - 1; i++) {
+                ctx.quadraticCurveTo(pointArr[i].x, pointArr[i].y, pointArr[i + 1].x, pointArr[i + 1].y)
+                ctx.moveTo(pointArr[i + 1].x, pointArr[i + 1].y);
+            }
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function listValues(pointArr) {
+            var table = document.getElementById("table");
+            table.innerHTML = `<thead><tr><td>Points (x,y)</td></tr></thead>`;
+            if (pointArr)
+                for (var i = 0; i < pointArr.length; i++)
+                    table.innerHTML += `<tr><td>${i + 1}</td><td>${pointArr[i].x}</td><td>${pointArr[i].y}</td></tr>`;
+        }
+    </script>
+
+</html>
