@@ -9,7 +9,7 @@
     </head>
 
     <body>
-        <div id="container" style="border: 2px solid; width: 95vw; height: 80vh; cursor: crosshair; margin-left: 2vw;">
+        <div id="container" style="border: 2px solid; width: 90vw; height: 80vh; cursor: crosshair; margin-left: 3vw;">
             <canvas id="canvas2" style="position:absolute"></canvas>
             <canvas id="canvas" style="position:absolute"></canvas>
         </div>
@@ -55,6 +55,7 @@
         var mouseClicked = false
         c.onmousedown = function (e) {
             clearStuffs();
+            document.body.style.overflow = "hidden"
             mouseClicked = true
             ctx.lineWidth = 3;
             console.log(e)
@@ -83,6 +84,7 @@
         c.ontouchstart = c.onmousedown;
         c.ontouchmove = c.onmousemove;
         c.onmouseup = function (e) {
+            document.body.style.overflow = "auto"
             points.push(initialPos);
             ctx.stroke();
             ctx.closePath();
