@@ -371,21 +371,23 @@
                             ctx2.lineTo(circlePoint2.x, circlePoint2.y)
                             ctx2.stroke()
                             ctx2.closePath()
-                            if (k == precision - 1) {
-                                ctx2.beginPath()
-                                ctx2.fillStyle = '0047aa'
-                                ctx2.ellipse(
+                            var pointSize = 3;
+                            if (k == precision - 1)
+                                pointSize = 5;
+                            ctx2.beginPath()
+                            ctx2.fillStyle = '0047aa'
+                            ctx2.ellipse(
                                     circlePoint2.x,
                                     circlePoint2.y,
-                                    5,
-                                    5,
+                                    pointSize,
+                                    pointSize,
                                     0,
                                     0,
                                     2 * Math.PI
-                                )
-                                ctx2.fill()
+                            )
+                            ctx2.fill()
                             }
-                        }
+                     
                         if (w * i < 4 * Math.PI) i++
                         else i = 0
                     }, 10)
