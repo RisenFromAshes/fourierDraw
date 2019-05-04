@@ -182,9 +182,9 @@
                 ctx2.beginPath()
                 ctx2.clearRect(0, 0, c2.width, c2.height)
                 shouldClick = true
+                window.scrollTo(0, 0)
                 rest.style.display = 'none'
                 document.body.setAttribute('class', 'lock-screen')
-                window.scrollTo(0, -100)
             }
 
             function clearCanvas() {
