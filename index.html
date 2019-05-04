@@ -301,6 +301,7 @@
             } else checkBox.checked = false
         }
         slider2.oninput = function () {
+            i = w*i*1000/this.value;
             w = this.value / 1000;
             drawCircles(slider.value-1)
             slider2Value.innerHTML = `w = ${w}`
