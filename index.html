@@ -5,6 +5,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>Fourier Draw</title>
+        <style>
+            .lock-screen {
+                height: 100%;
+                overflow: hidden;
+                width: 100%;
+                position: fixed;
+            }
+        </style>
     </head>
 
     <body>
@@ -15,407 +23,420 @@
             <canvas id="canvas2" style="position:absolute"></canvas>
             <canvas id="canvas" style="position:absolute"></canvas>
         </div>
-    </body>
-    <button onclick="clearStuffs()">Clear Shits</button>
-    <button onclick="listFourier()">Calculate Fourier Coefficients</button>
-    <button onclick="listFourierValues()">Fourier Values</button>
-    <label>
-        Animate Circles
-        <input
-            type="checkbox"
-            checked="false"
-            id="checkBox"
-            style="width:1.5vw; height:1.5vw"
-        />
-    </label>
-    <div class="slidecontainer">
-        <p>Precision</p>
-        <input
-            type="range"
-            min="0"
-            max="100"
-            value="100"
-            id="slider"
-            style="width:80vw"
-        />
-        <div id="cValue">n circles</div>
-        <p>Speed Multiplier</p>
-        <input
-            type="range"
-            min="1"
-            max="1000"
-            value="200"
-            id="slider2"
-            style="width:80vw"
-        />
-        <div id="sValue">w = 0.02</div>
-    </div>
-    <table id="table"></table>
-    <script>
-        var container = document.getElementById('container')
-        var slider = document.getElementById('slider')
-        var sliderValue = document.getElementById('cValue')
-        var slider2 = document.getElementById('slider2')
-        var slider2Value = document.getElementById('sValue')
-        var checkBox = document.getElementById('checkBox')
-        checkBox.checked = false
-        var c = document.getElementById('canvas')
-        c.width = parseInt(getComputedStyle(container).width.replace('px', ''))
-        c.height = parseInt(
-            getComputedStyle(container).height.replace('px', '')
-        )
-        var ctx = c.getContext('2d')
-        var boundingRect = c.getBoundingClientRect()
-        var c2 = document.getElementById('canvas2')
-        c2.width = c.width
-        c2.height = c.height
-        var ctx2 = c2.getContext('2d')
-
-        var initialPos
-        var points = []
-
-        var point = function(x, y) {
-            this.x = x
-            this.y = y
-        }
-        var complexNumber = function(Re, Im) {
-            this.Re = Re
-            this.Im = Im
-        }
-        var FourierCoefficients = [],
-            FourierValues = []
-        var prevPoint, nowPoint
-        var mouseClicked = false
-        c.onmousedown = function(e) {
-            clearStuffs()
-            window.scrollTo(0, 0)
-            c.style.position = 'fixed'
-            c2.style.position = 'fixed'
-            document.body.style.overflow = 'hidden'
-            document.body.style.touchAction = 'none'
-            mouseClicked = true
-            ctx.strokeStyle = '#000'
-            ctx.lineWidth = 3
-            console.log(e)
-            initialPos = new point(
-                e.x
-                    ? e.pageX - boundingRect.left
-                    : e.touches[0].pageX - boundingRect.left,
-                e.y
-                    ? e.pageY - boundingRect.top
-                    : e.touches[0].pageY - boundingRect.left
+        <div id="rest">
+            <button onclick="clearStuffs()">Clear Shits</button>
+            <button onclick="listFourier()">
+                Calculate Fourier Coefficients
+            </button>
+            <button onclick="listFourierValues()">Fourier Values</button>
+            <label>
+                Animate Circles
+                <input
+                    type="checkbox"
+                    checked="false"
+                    id="checkBox"
+                    style="width:1.5vw; height:1.5vw"
+                />
+            </label>
+            <div class="slidecontainer">
+                <p>Precision</p>
+                <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="100"
+                    id="slider"
+                    style="width:80vw"
+                />
+                <div id="cValue">n circles</div>
+                <p>Speed Multiplier</p>
+                <input
+                    type="range"
+                    min="1"
+                    max="1000"
+                    value="200"
+                    id="slider2"
+                    style="width:80vw"
+                />
+                <div id="sValue">w = 0.02</div>
+            </div>
+            <table id="table"></table>
+        </div>
+        <script>
+            var container = document.getElementById('container')
+            var rest = document.getElementById('rest')
+            var slider = document.getElementById('slider')
+            var sliderValue = document.getElementById('cValue')
+            var slider2 = document.getElementById('slider2')
+            var slider2Value = document.getElementById('sValue')
+            var checkBox = document.getElementById('checkBox')
+            checkBox.checked = false
+            var c = document.getElementById('canvas')
+            c.width = parseInt(
+                getComputedStyle(container).width.replace('px', '')
             )
-            points.push(initialPos)
-            ctx.lineStyle = '#000'
-            ctx.moveTo(initialPos.x, initialPos.y)
-        }
-        c.onmousemove = function(e) {
-            if (mouseClicked) {
+            c.height = parseInt(
+                getComputedStyle(container).height.replace('px', '')
+            )
+            var ctx = c.getContext('2d')
+            var boundingRect = c.getBoundingClientRect()
+            var c2 = document.getElementById('canvas2')
+            c2.width = c.width
+            c2.height = c.height
+            var ctx2 = c2.getContext('2d')
+
+            var initialPos
+            var points = []
+
+            var point = function(x, y) {
+                this.x = x
+                this.y = y
+            }
+            var complexNumber = function(Re, Im) {
+                this.Re = Re
+                this.Im = Im
+            }
+            var FourierCoefficients = [],
+                FourierValues = []
+            var prevPoint, nowPoint
+            var mouseClicked = false
+            c.onmousedown = function(e) {
+                clearStuffs()
                 window.scrollTo(0, 0)
-                newPoint = new point(
-                    e.pageX
+                container.style.position = 'fixed'
+                document.body.style.overflow = 'hidden'
+                rest.style.visibility = 'hidden'
+                document.body.setAttribute('class', 'lock-screen')
+                mouseClicked = true
+                ctx.strokeStyle = '#000'
+                ctx.lineWidth = 3
+                console.log(e)
+                initialPos = new point(
+                    e.x
                         ? e.pageX - boundingRect.left
                         : e.touches[0].pageX - boundingRect.left,
-                    e.pageY
+                    e.y
                         ? e.pageY - boundingRect.top
                         : e.touches[0].pageY - boundingRect.left
                 )
-                ctx.lineTo(newPoint.x, newPoint.y)
-                if (!prevPoint) prevPoint = initialPos
-                var distance = Math.hypot(
-                    prevPoint.x - newPoint.x,
-                    prevPoint.y - newPoint.y
-                )
-                if (distance > 10) {
-                    points.push(newPoint)
-                    prevPoint = newPoint
+                points.push(initialPos)
+                ctx.lineStyle = '#000'
+                ctx.moveTo(initialPos.x, initialPos.y)
+            }
+            c.onmousemove = function(e) {
+                if (mouseClicked) {
+                    window.scrollTo(0, 0)
+                    newPoint = new point(
+                        e.pageX
+                            ? e.pageX - boundingRect.left
+                            : e.touches[0].pageX - boundingRect.left,
+                        e.pageY
+                            ? e.pageY - boundingRect.top
+                            : e.touches[0].pageY - boundingRect.left
+                    )
+                    ctx.lineTo(newPoint.x, newPoint.y)
+                    if (!prevPoint) prevPoint = initialPos
+                    var distance = Math.hypot(
+                        prevPoint.x - newPoint.x,
+                        prevPoint.y - newPoint.y
+                    )
+                    if (distance > 10) {
+                        points.push(newPoint)
+                        prevPoint = newPoint
+                    }
+                    ctx.stroke()
                 }
+            }
+            c.ontouchstart = c.onmousedown
+            c.ontouchmove = c.onmousemove
+            c.onmouseup = function(e) {
+                container.style.position = 'relative'
+                document.body.style.overflow = 'auto'
+                document.body.setAttribute('class', '')
+                rest.style.visibility = 'visible'
+                points.push(initialPos)
                 ctx.stroke()
-            }
-        }
-        c.ontouchstart = c.onmousedown
-        c.ontouchmove = c.onmousemove
-        c.onmouseup = function(e) {
-            c.style.position = 'absolute'
-            c2.style.position = 'absolute'
-            document.body.style.touchAction = 'auto'
-            document.body.style.overflow = 'auto'
-            points.push(initialPos)
-            ctx.stroke()
-            ctx.closePath()
-            clearCanvas()
-            drawBezier(points, 'black')
-            listValues(points)
-            mouseClicked = false
-        }
-        c.ontouchend = c.onmouseup
-
-        function clearStuffs() {
-            points = []
-            FourierValues = []
-            FourierCoefficients = []
-            checkBox.checked = false
-            clearInterval(timer)
-            listValues(null)
-            ctx.beginPath()
-            ctx.clearRect(0, 0, c.width, c.height)
-            ctx2.beginPath()
-            ctx2.clearRect(0, 0, c2.width, c2.height)
-        }
-
-        function clearCanvas() {
-            ctx.beginPath()
-            ctx.clearRect(0, 0, c.width, c.height)
-        }
-
-        function fourierTransform(pointArr) {
-            var fourierCoefficients = []
-            var N = pointArr.length - 1
-            for (var j = 0; j < pointArr.length - 1; j++) {
-                var Re_NF_j = 0,
-                    Im_NF_j = 0
-                for (var k = 0; k < pointArr.length - 1; k++) {
-                    var theta = -(2 * Math.PI * k * j) / N
-                    Re_NF_j +=
-                        Math.cos(theta) * pointArr[k].x -
-                        Math.sin(theta) * pointArr[k].y
-                    Im_NF_j +=
-                        Math.cos(theta) * pointArr[k].y +
-                        Math.sin(theta) * pointArr[k].x
-                }
-                fourierCoefficients.push(
-                    new complexNumber(Re_NF_j / N, Im_NF_j / N)
-                )
-            }
-            return fourierCoefficients
-        }
-
-        function listFourier() {
-            var fourierCoefficients = fourierTransform(points)
-            FourierCoefficients = fourierCoefficients
-            var table = document.getElementById('table')
-            table.innerHTML = `<thead><tr><td>Fourier Coefficients</td></tr></thead>`
-            if (fourierCoefficients)
-                for (var i = 0; i < fourierCoefficients.length; i++)
-                    table.innerHTML += `<tr><td>${i + 1}</td><td>${
-                        fourierCoefficients[i].Re
-                    }</td><td>${fourierCoefficients[i].Im}</td></tr>`
-        }
-
-        function fourierDraw(fourierCoefficients, PrecisionCount) {
-            var fourierValues = []
-            var N = fourierCoefficients.length
-            var precisionCount = PrecisionCount || N
-            for (var j = 0; j < fourierCoefficients.length; j++) {
-                var Re_NF_j = 0,
-                    Im_NF_j = 0,
-                    firstx,
-                    firsty,
-                    k
-                for (var i = 0; i < precisionCount; i++) {
-                    if (i % 2 == 0) k = i / 2
-                    else k = N - Math.ceil(i / 2)
-                    var theta = (2 * Math.PI * k * j) / N
-                    Re_NF_j +=
-                        Math.cos(theta) * fourierCoefficients[k].Re -
-                        Math.sin(theta) * fourierCoefficients[k].Im
-                    Im_NF_j +=
-                        Math.cos(theta) * fourierCoefficients[k].Im +
-                        Math.sin(theta) * fourierCoefficients[k].Re
-                }
-                fourierValues.push(new point(Re_NF_j, Im_NF_j))
-                if (j == 0) {
-                    firstx = Re_NF_j
-                    firsty = Im_NF_j
-                }
-            }
-            fourierValues.push(new point(firstx, firsty))
-            return fourierValues
-        }
-
-        function listFourierValues() {
-            if (FourierCoefficients.length === 0)
-                FourierCoefficients = fourierTransform(points)
-            FourierValues = fourierDraw(FourierCoefficients)
-            listValues(FourierValues)
-            drawPoints(FourierValues)
-            slider.max = FourierValues.length - 1
-            slider.value = FourierValues.length
-            sliderValue.innerHTML = `${slider.value - 1} circles`
-            slider.oninput = function() {
+                ctx.closePath()
                 clearCanvas()
-                drawBezier(points, '#ADADAD', 2)
-                drawBezier(
-                    fourierDraw(FourierCoefficients, this.value),
-                    'blue',
-                    3
-                )
-                if (checkBox.checked) drawCircles(this.value - 1)
-                sliderValue.innerHTML = `${this.value - 1} circles`
+                drawBezier(points, 'black')
+                listValues(points)
+                mouseClicked = false
             }
-            slider.onchange = slider.oninput
-        }
+            c.ontouchend = c.onmouseup
 
-        var w = 0.02
-
-        var circlePoints = [[]]
-        var prevMultiplier = -1
-
-        function getCirclePoints(N, i, phaseMultiplier) {
-            var k, f
-            if (phaseMultiplier != prevMultiplier)
-                circlePoints[phaseMultiplier] = []
-            prevMultiplier = phaseMultiplier
-            var basePhase = phaseMultiplier * w
-            if (i % 2 == 0) {
-                k = i / 2
-                f = k / 2
-            } else {
-                k = N - Math.ceil(i / 2)
-                f = -Math.ceil(i / 2) / 2
+            function clearStuffs() {
+                points = []
+                FourierValues = []
+                FourierCoefficients = []
+                checkBox.checked = false
+                clearInterval(timer)
+                listValues(null)
+                ctx.beginPath()
+                ctx.clearRect(0, 0, c.width, c.height)
+                ctx2.beginPath()
+                ctx2.clearRect(0, 0, c2.width, c2.height)
             }
-            if (i == 0) {
-                circlePoints[phaseMultiplier][0] = new point(
-                    FourierCoefficients[0].Re,
-                    FourierCoefficients[0].Im
-                )
-                return circlePoints[phaseMultiplier][0]
-            } else {
+
+            function clearCanvas() {
+                ctx.beginPath()
+                ctx.clearRect(0, 0, c.width, c.height)
+            }
+
+            function fourierTransform(pointArr) {
+                var fourierCoefficients = []
+                var N = pointArr.length - 1
+                for (var j = 0; j < pointArr.length - 1; j++) {
+                    var Re_NF_j = 0,
+                        Im_NF_j = 0
+                    for (var k = 0; k < pointArr.length - 1; k++) {
+                        var theta = -(2 * Math.PI * k * j) / N
+                        Re_NF_j +=
+                            Math.cos(theta) * pointArr[k].x -
+                            Math.sin(theta) * pointArr[k].y
+                        Im_NF_j +=
+                            Math.cos(theta) * pointArr[k].y +
+                            Math.sin(theta) * pointArr[k].x
+                    }
+                    fourierCoefficients.push(
+                        new complexNumber(Re_NF_j / N, Im_NF_j / N)
+                    )
+                }
+                return fourierCoefficients
+            }
+
+            function listFourier() {
+                var fourierCoefficients = fourierTransform(points)
+                FourierCoefficients = fourierCoefficients
+                var table = document.getElementById('table')
+                table.innerHTML = `<thead><tr><td>Fourier Coefficients</td></tr></thead>`
+                if (fourierCoefficients)
+                    for (var i = 0; i < fourierCoefficients.length; i++)
+                        table.innerHTML += `<tr><td>${i + 1}</td><td>${
+                            fourierCoefficients[i].Re
+                        }</td><td>${fourierCoefficients[i].Im}</td></tr>`
+            }
+
+            function fourierDraw(fourierCoefficients, PrecisionCount) {
+                var fourierValues = []
+                var N = fourierCoefficients.length
+                var precisionCount = PrecisionCount || N
+                for (var j = 0; j < fourierCoefficients.length; j++) {
+                    var Re_NF_j = 0,
+                        Im_NF_j = 0,
+                        firstx,
+                        firsty,
+                        k
+                    for (var i = 0; i < precisionCount; i++) {
+                        if (i % 2 == 0) k = i / 2
+                        else k = N - Math.ceil(i / 2)
+                        var theta = (2 * Math.PI * k * j) / N
+                        Re_NF_j +=
+                            Math.cos(theta) * fourierCoefficients[k].Re -
+                            Math.sin(theta) * fourierCoefficients[k].Im
+                        Im_NF_j +=
+                            Math.cos(theta) * fourierCoefficients[k].Im +
+                            Math.sin(theta) * fourierCoefficients[k].Re
+                    }
+                    fourierValues.push(new point(Re_NF_j, Im_NF_j))
+                    if (j == 0) {
+                        firstx = Re_NF_j
+                        firsty = Im_NF_j
+                    }
+                }
+                fourierValues.push(new point(firstx, firsty))
+                return fourierValues
+            }
+
+            function listFourierValues() {
+                if (FourierCoefficients.length === 0)
+                    FourierCoefficients = fourierTransform(points)
+                FourierValues = fourierDraw(FourierCoefficients)
+                listValues(FourierValues)
+                drawPoints(FourierValues)
+                slider.max = FourierValues.length - 1
+                slider.value = FourierValues.length
+                sliderValue.innerHTML = `${slider.value - 1} circles`
+                slider.oninput = function() {
+                    clearCanvas()
+                    drawBezier(points, '#ADADAD', 2)
+                    drawBezier(
+                        fourierDraw(FourierCoefficients, this.value),
+                        'blue',
+                        3
+                    )
+                    if (checkBox.checked) drawCircles(this.value - 1)
+                    sliderValue.innerHTML = `${this.value - 1} circles`
+                }
+                slider.onchange = slider.oninput
+            }
+
+            var w = 0.02
+
+            var circlePoints = [[]]
+            var prevMultiplier = -1
+
+            function getCirclePoints(N, i, phaseMultiplier) {
+                var k, f
+                if (phaseMultiplier != prevMultiplier)
+                    circlePoints[phaseMultiplier] = []
+                prevMultiplier = phaseMultiplier
+                var basePhase = phaseMultiplier * w
+                if (i % 2 == 0) {
+                    k = i / 2
+                    f = k / 2
+                } else {
+                    k = N - Math.ceil(i / 2)
+                    f = -Math.ceil(i / 2) / 2
+                }
+                if (i == 0) {
+                    circlePoints[phaseMultiplier][0] = new point(
+                        FourierCoefficients[0].Re,
+                        FourierCoefficients[0].Im
+                    )
+                    return circlePoints[phaseMultiplier][0]
+                } else {
+                    var x = FourierCoefficients[k].Re,
+                        y = FourierCoefficients[k].Im
+
+                    circlePoints[phaseMultiplier][i] = new point(
+                        x * Math.cos(basePhase * f) -
+                            y * Math.sin(basePhase * f) +
+                            circlePoints[phaseMultiplier][i - 1].x,
+                        y * Math.cos(basePhase * f) +
+                            x * Math.sin(basePhase * f) +
+                            circlePoints[phaseMultiplier][i - 1].y
+                    )
+                    return circlePoints[phaseMultiplier][i]
+                }
+            }
+
+            function getRadius(N, i) {
+                var k
+                if (i % 2 == 0) {
+                    k = i / 2
+                } else {
+                    k = N - Math.ceil(i / 2)
+                }
                 var x = FourierCoefficients[k].Re,
                     y = FourierCoefficients[k].Im
-
-                circlePoints[phaseMultiplier][i] = new point(
-                    x * Math.cos(basePhase * f) -
-                        y * Math.sin(basePhase * f) +
-                        circlePoints[phaseMultiplier][i - 1].x,
-                    y * Math.cos(basePhase * f) +
-                        x * Math.sin(basePhase * f) +
-                        circlePoints[phaseMultiplier][i - 1].y
-                )
-                return circlePoints[phaseMultiplier][i]
+                return Math.hypot(x, y)
             }
-        }
+            var i = 0,
+                timer
 
-        function getRadius(N, i) {
-            var k
-            if (i % 2 == 0) {
-                k = i / 2
-            } else {
-                k = N - Math.ceil(i / 2)
-            }
-            var x = FourierCoefficients[k].Re,
-                y = FourierCoefficients[k].Im
-            return Math.hypot(x, y)
-        }
-        var i = 0,
-            timer
-
-        function drawCircles(precision) {
-            if (FourierCoefficients.length > 0 && FourierValues.length > 0) {
-                var x0, y0, x, y
-                if (timer) clearInterval(timer)
-                timer = setInterval(() => {
-                    ctx2.closePath()
-                    ctx2.beginPath()
-                    ctx2.clearRect(0, 0, c2.width, c2.height)
-                    var N = FourierCoefficients.length
-                    for (var k = 0; k < precision; k++) {
-                        var radius = getRadius(N, k + 1)
-                        var circlePoint1 = getCirclePoints(N, k, i),
-                            circlePoint2 = getCirclePoints(N, k + 1, i)
-                        ctx2.beginPath()
-                        ctx2.moveTo(circlePoint1.x + radius, circlePoint1.y)
-                        ctx2.strokeStyle = '#5099FF'
-                        ctx2.lineWidth = 2
-                        ctx2.arc(
-                            circlePoint1.x,
-                            circlePoint1.y,
-                            radius,
-                            0,
-                            2 * Math.PI
-                        )
-                        ctx2.stroke()
+            function drawCircles(precision) {
+                if (
+                    FourierCoefficients.length > 0 &&
+                    FourierValues.length > 0
+                ) {
+                    var x0, y0, x, y
+                    if (timer) clearInterval(timer)
+                    timer = setInterval(() => {
                         ctx2.closePath()
                         ctx2.beginPath()
-
-                        ctx2.strokeStyle = '#0047aa'
-                        ctx2.lineWidth = 1
-                        ctx2.moveTo(circlePoint1.x, circlePoint1.y)
-                        ctx2.lineTo(circlePoint2.x, circlePoint2.y)
-                        ctx2.stroke()
-                        ctx2.closePath()
-                        if (k == precision - 1) {
+                        ctx2.clearRect(0, 0, c2.width, c2.height)
+                        var N = FourierCoefficients.length
+                        for (var k = 0; k < precision; k++) {
+                            var radius = getRadius(N, k + 1)
+                            var circlePoint1 = getCirclePoints(N, k, i),
+                                circlePoint2 = getCirclePoints(N, k + 1, i)
                             ctx2.beginPath()
-                            ctx2.fillStyle = '0047aa'
-                            ctx2.ellipse(
-                                circlePoint2.x,
-                                circlePoint2.y,
-                                5,
-                                5,
-                                0,
+                            ctx2.moveTo(circlePoint1.x + radius, circlePoint1.y)
+                            ctx2.strokeStyle = '#5099FF'
+                            ctx2.lineWidth = 2
+                            ctx2.arc(
+                                circlePoint1.x,
+                                circlePoint1.y,
+                                radius,
                                 0,
                                 2 * Math.PI
                             )
-                            ctx2.fill()
+                            ctx2.stroke()
+                            ctx2.closePath()
+                            ctx2.beginPath()
+
+                            ctx2.strokeStyle = '#0047aa'
+                            ctx2.lineWidth = 1
+                            ctx2.moveTo(circlePoint1.x, circlePoint1.y)
+                            ctx2.lineTo(circlePoint2.x, circlePoint2.y)
+                            ctx2.stroke()
+                            ctx2.closePath()
+                            if (k == precision - 1) {
+                                ctx2.beginPath()
+                                ctx2.fillStyle = '0047aa'
+                                ctx2.ellipse(
+                                    circlePoint2.x,
+                                    circlePoint2.y,
+                                    5,
+                                    5,
+                                    0,
+                                    0,
+                                    2 * Math.PI
+                                )
+                                ctx2.fill()
+                            }
                         }
-                    }
-                    if (w * i < 4 * Math.PI) i++
-                    else i = 0
-                }, 10)
+                        if (w * i < 4 * Math.PI) i++
+                        else i = 0
+                    }, 10)
+                }
             }
-        }
 
-        checkBox.onchange = function() {
-            if (FourierCoefficients.length > 0 && FourierValues.length > 0) {
-                checkBox.checked = true
-                drawCircles(slider.value)
-            } else checkBox.checked = false
-        }
-        slider2.oninput = function() {
-            i = (w * i * 1000) / this.value
-            w = this.value / 1000
-            drawCircles(slider.value - 1)
-            slider2Value.innerHTML = `w = ${w}`
-        }
-        slider2.onchange = slider2.oninput
-
-        function drawPoints(pointArr, color) {
-            ctx.strokeStyle = color || 'blue'
-            ctx.beginPath()
-            ctx.moveTo(pointArr[0].x, pointArr[0].y)
-            for (var i = 1; i < pointArr.length; i++) {
-                ctx.lineTo(pointArr[i].x, pointArr[i].y)
+            checkBox.onchange = function() {
+                if (
+                    FourierCoefficients.length > 0 &&
+                    FourierValues.length > 0
+                ) {
+                    checkBox.checked = true
+                    drawCircles(slider.value)
+                } else checkBox.checked = false
             }
-            ctx.stroke()
-            ctx.closePath()
-        }
-
-        function drawBezier(pointArr, color, lineWidth) {
-            ctx.strokeStyle = color || 'blue'
-            ctx.lineWidth = lineWidth
-            ctx.beginPath()
-            ctx.moveTo(pointArr[0].x, pointArr[0].y)
-            for (var i = 0; i < pointArr.length - 1; i++) {
-                ctx.quadraticCurveTo(
-                    pointArr[i].x,
-                    pointArr[i].y,
-                    pointArr[i + 1].x,
-                    pointArr[i + 1].y
-                )
-                ctx.moveTo(pointArr[i + 1].x, pointArr[i + 1].y)
+            slider2.oninput = function() {
+                i = (w * i * 1000) / this.value
+                w = this.value / 1000
+                drawCircles(slider.value - 1)
+                slider2Value.innerHTML = `w = ${w}`
             }
-            ctx.stroke()
-            ctx.closePath()
-        }
+            slider2.onchange = slider2.oninput
 
-        function listValues(pointArr) {
-            var table = document.getElementById('table')
-            table.innerHTML = `<thead><tr><td>Points (x,y)</td></tr></thead>`
-            if (pointArr)
-                for (var i = 0; i < pointArr.length; i++)
-                    table.innerHTML += `<tr><td>${i + 1}</td><td>${
-                        pointArr[i].x
-                    }</td><td>${pointArr[i].y}</td></tr>`
-        }
-    </script>
+            function drawPoints(pointArr, color) {
+                ctx.strokeStyle = color || 'blue'
+                ctx.beginPath()
+                ctx.moveTo(pointArr[0].x, pointArr[0].y)
+                for (var i = 1; i < pointArr.length; i++) {
+                    ctx.lineTo(pointArr[i].x, pointArr[i].y)
+                }
+                ctx.stroke()
+                ctx.closePath()
+            }
+
+            function drawBezier(pointArr, color, lineWidth) {
+                ctx.strokeStyle = color || 'blue'
+                ctx.lineWidth = lineWidth
+                ctx.beginPath()
+                ctx.moveTo(pointArr[0].x, pointArr[0].y)
+                for (var i = 0; i < pointArr.length - 1; i++) {
+                    ctx.quadraticCurveTo(
+                        pointArr[i].x,
+                        pointArr[i].y,
+                        pointArr[i + 1].x,
+                        pointArr[i + 1].y
+                    )
+                    ctx.moveTo(pointArr[i + 1].x, pointArr[i + 1].y)
+                }
+                ctx.stroke()
+                ctx.closePath()
+            }
+
+            function listValues(pointArr) {
+                var table = document.getElementById('table')
+                table.innerHTML = `<thead><tr><td>Points (x,y)</td></tr></thead>`
+                if (pointArr)
+                    for (var i = 0; i < pointArr.length; i++)
+                        table.innerHTML += `<tr><td>${i + 1}</td><td>${
+                            pointArr[i].x
+                        }</td><td>${pointArr[i].y}</td></tr>`
+            }
+        </script>
+    </body>
 </html>
