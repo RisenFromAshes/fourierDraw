@@ -88,7 +88,9 @@
         var mouseClicked = false
         c.onmousedown = function(e) {
             clearStuffs()
-            window.scrollTo(0,0);
+            window.scrollTo(0, 0)
+            c.style.position = 'fixed'
+            c2.style.position = 'fixed'
             document.body.style.overflow = 'hidden'
             mouseClicked = true
             ctx.strokeStyle = '#000'
@@ -108,7 +110,7 @@
         }
         c.onmousemove = function(e) {
             if (mouseClicked) {
-                window.scrollTo(0,0)
+                window.scrollTo(0, 0)
                 newPoint = new point(
                     e.pageX
                         ? e.pageX - boundingRect.left
@@ -133,6 +135,8 @@
         c.ontouchstart = c.onmousedown
         c.ontouchmove = c.onmousemove
         c.onmouseup = function(e) {
+            c.style.position = 'absolute'
+            c2.style.position = 'absolute'
             document.body.style.overflow = 'auto'
             points.push(initialPos)
             ctx.stroke()
