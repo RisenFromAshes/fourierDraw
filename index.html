@@ -301,7 +301,7 @@
 
         checkBox.onchange = function () {
             if ((FourierCoefficients.length > 0) && (FourierValues.length > 0)) {
-                if(checkBox.checked){
+                if(!checkBox.checked){
                     checkBox.checked = true;
                     drawCircles(slider.value)
                 }
