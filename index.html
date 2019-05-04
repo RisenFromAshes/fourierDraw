@@ -88,6 +88,7 @@
         var mouseClicked = false
         c.onmousedown = function(e) {
             clearStuffs()
+            window.scrollTo(0,0);
             document.body.style.overflow = 'hidden'
             mouseClicked = true
             ctx.strokeStyle = '#000'
@@ -107,6 +108,7 @@
         }
         c.onmousemove = function(e) {
             if (mouseClicked) {
+                window.scrollTo(0,0)
                 newPoint = new point(
                     e.pageX
                         ? e.pageX - boundingRect.left
