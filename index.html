@@ -212,7 +212,8 @@
 
         function getCirclePoints(N, i, phaseMultiplier) {
             var k, f;
-            if (phaseMultiplier != prevMultiplier) circlePoints[phaseMultiplier] = []
+            if (phaseMultiplier != prevMultiplier && ( !circlePoints[phaseMultiplier] || circlePoints[phaseMultiplier].length === 0) 
+                circlePoints[phaseMultiplier] = []
             prevMultiplier = phaseMultiplier;
             var basePhase = phaseMultiplier * w;
             if (i % 2 == 0) {
@@ -223,12 +224,13 @@
                 f = -Math.ceil(i / 2) / 2;
             }
             if (i == 0) {
-                circlePoints[phaseMultiplier][0] = new point(FourierCoefficients[0].Re, FourierCoefficients[0].Im)
+                if(!circlePoints[phaseMultiplier][0]) circlePoints[phaseMultiplier][0] = new point(FourierCoefficients[0].Re, FourierCoefficients[0].Im)
                 return circlePoints[phaseMultiplier][0]
             } else {
                 var x = FourierCoefficients[k].Re,
                     y = FourierCoefficients[k].Im;
-                circlePoints[phaseMultiplier][i] = new point(x * Math.cos(basePhase * f) - y * Math.sin(basePhase * f) +
+                if(!circlePoints[phaseMultiplier][i])
+                    circlePoints[phaseMultiplier][i] = new point(x * Math.cos(basePhase * f) - y * Math.sin(basePhase * f) +
                     circlePoints[phaseMultiplier][i -
                         1
                     ].x,
