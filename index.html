@@ -302,7 +302,7 @@
         }
         slider2.oninput = function () {
             w = this.value / 1000;
-            drawCircles(slider.value)
+            drawCircles(slider.value-1)
             slider2Value.innerHTML = `w = ${w}`
         }
         slider2.onchange = slider2.oninput
