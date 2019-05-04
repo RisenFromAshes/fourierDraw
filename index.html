@@ -301,15 +301,8 @@
 
         checkBox.onchange = function () {
             if ((FourierCoefficients.length > 0) && (FourierValues.length > 0)) {
-                if(!checkBox.checked){
-                    checkBox.checked = true;
-                    drawCircles(slider.value)
-                }
-                else{
-                    clearInterval(timer);
-                    ctx2.beginPath();
-                    ctx2.clearRect(0, 0, c2.width, c2.height);
-                }
+                checkBox.checked = true;
+                drawCircles(slider.value)
             } else checkBox.checked = false
         }
         slider2.oninput = function () {
