@@ -181,8 +181,9 @@
                 ctx.clearRect(0, 0, c.width, c.height)
                 ctx2.beginPath()
                 ctx2.clearRect(0, 0, c2.width, c2.height)
-                window.scrollTo(0, 0)
                 shouldClick = true
+                rest.style.display = 'none'
+                window.scrollTo(0, 0)
             }
 
             function clearCanvas() {
