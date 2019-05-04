@@ -256,7 +256,9 @@
             timer;
 
         function drawCircles(precision) {
-
+        if((FourierCoefficients.length > 0) && (FourierValues.length > 0))
+           {
+           
             var x0, y0,
                 x, y;
             if (timer) clearInterval(timer)
@@ -294,6 +296,7 @@
                 if (w * i < 4 * Math.PI) i++;
                 else i = 0;
             }, 10)
+           }
         }
 
         checkBox.onchange = function () {
