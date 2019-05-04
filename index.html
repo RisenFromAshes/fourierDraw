@@ -100,29 +100,32 @@
                 FourierValues = []
             var prevPoint, nowPoint
             var mouseClicked = false
+            var shouldClick = true
             c.onmousedown = function(e) {
-                clearStuffs()
-                window.scrollTo(0, 0)
-                container.style.position = 'fixed'
-                document.body.style.overflow = 'hidden'
-                document.body.style.touchAction = 'none'
-                rest.style.display = 'none'
-                document.body.setAttribute('class', 'lock-screen')
-                mouseClicked = true
-                ctx.strokeStyle = '#000'
-                ctx.lineWidth = 3
-                console.log(e)
-                initialPos = new point(
-                    e.x
-                        ? e.pageX - boundingRect.left
-                        : e.touches[0].pageX - boundingRect.left,
-                    e.y
-                        ? e.pageY - boundingRect.top
-                        : e.touches[0].pageY - boundingRect.left
-                )
-                points.push(initialPos)
-                ctx.lineStyle = '#000'
-                ctx.moveTo(initialPos.x, initialPos.y)
+                if (shouldClick) {
+                    clearStuffs()
+                    window.scrollTo(0, 0)
+                    container.style.position = 'fixed'
+                    document.body.style.overflow = 'hidden'
+                    document.body.style.touchAction = 'none'
+                    rest.style.display = 'none'
+                    document.body.setAttribute('class', 'lock-screen')
+                    ctx.strokeStyle = '#000'
+                    ctx.lineWidth = 3
+                    console.log(e)
+                    initialPos = new point(
+                        e.x
+                            ? e.pageX - boundingRect.left
+                            : e.touches[0].pageX - boundingRect.left,
+                        e.y
+                            ? e.pageY - boundingRect.top
+                            : e.touches[0].pageY - boundingRect.left
+                    )
+                    points.push(initialPos)
+                    ctx.lineStyle = '#000'
+                    ctx.moveTo(initialPos.x, initialPos.y)
+                    mouseClicked = true
+                }
             }
             c.onmousemove = function(e) {
                 if (mouseClicked) {
@@ -163,6 +166,7 @@
                 drawBezier(points, 'black')
                 listValues(points)
                 mouseClicked = false
+                shouldClick = false
             }
             c.ontouchend = c.onmouseup
 
@@ -177,6 +181,8 @@
                 ctx.clearRect(0, 0, c.width, c.height)
                 ctx2.beginPath()
                 ctx2.clearRect(0, 0, c2.width, c2.height)
+                window.scrollTo(0, 0)
+                shouldClick = true
             }
 
             function clearCanvas() {
