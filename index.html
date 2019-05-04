@@ -92,6 +92,7 @@
             c.style.position = 'fixed'
             c2.style.position = 'fixed'
             document.body.style.overflow = 'hidden'
+            document.body.style.touchAction = 'none'
             mouseClicked = true
             ctx.strokeStyle = '#000'
             ctx.lineWidth = 3
@@ -137,6 +138,7 @@
         c.onmouseup = function(e) {
             c.style.position = 'absolute'
             c2.style.position = 'absolute'
+            document.body.style.touchAction = 'auto'
             document.body.style.overflow = 'auto'
             points.push(initialPos)
             ctx.stroke()
