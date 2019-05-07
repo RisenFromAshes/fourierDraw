@@ -36,19 +36,56 @@
                 <canvas id="mCanvas" resize></canvas>
             </div>
             <form class="form-inline">
-                <div class="form-group">
-                    <label for="">Fill Color:</label>
+                <div class="form-group mr-2">
+                    <label for="">Fill Color: </label>
                     <input type="text" name="" id="fillColorPicker" class="form-control">
                 </div>
-                <div class="form-group">
-                    <label for="">Stroke Color:</label>
+                <div class="form-group mr-2">
+                    <label for="">Stroke Color: </label>
                     <input type="text" name="" id="strokeColorPicker" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="">Stroke Width:</label>
+                    <label for="" id="strokeValue">2 px</label>
+                    <input type="range" name="" id="strokeSlider" class="slider" min="1" max="20" step="1" value="1">
+                    <style>
+                        .slider {
+                            -webkit-appearance: none;
+                            width: 100%;
+                            height: 10px;
+                            border-radius: 5px;
+                            background: #d3d3d3;
+                            outline: none;
+                            opacity: 0.7;
+                            -webkit-transition: .2s;
+                            transition: opacity .2s;
+                        }
+
+                        .slider::-webkit-slider-thumb {
+                            -webkit-appearance: none;
+                            appearance: none;
+                            width: 15px;
+                            height: 15px;
+                            border-radius: 50%;
+                            background: rgb(0, 0, 0);
+                            cursor: pointer;
+                        }
+
+                        .slider::-moz-range-thumb {
+                            width: 15px;
+                            height: 15px;
+                            border-radius: 50%;
+                            background: rgb(0, 0, 0);
+                            cursor: pointer;
+                        }
+                    </style>
                 </div>
             </form>
         </div>
         <script>
             var fillColor = 'rgba(255,255,255,0)';
             var strokeColor = 'rgba(0,0,0,1)';
+            var strokeWidth = 3;
 
             function fitCanvas() {
                 $('#mCanvas').width($('#canvasContainer').width())
@@ -75,6 +112,10 @@
                     change: setStrokeColor,
                     move: setStrokeColor
                 });
+                $('#strokeSlider').on('input', function (event) {
+                    strokeWidth = this.value;
+                    $('#strokeValue').text(`${this.value} px`)
+                })
             });
         </script>
     </body>
