@@ -1,67 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
     <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <title>Fourier Draw</title>
-        <style>
-            .lock-screen {
-                height: 100%;
-                overflow: hidden;
-                width: 100%;
-                position: fixed;
-            }
-        </style>
+        <title>Title</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+            crossorigin="anonymous" />
     </head>
 
     <body>
-        <div
-            id="container"
-            style="border: 2px solid; width: 90vw; height: 80vh; cursor: crosshair; margin-left: 3vw;"
-        >
-            <canvas id="canvas2" style="position:absolute"></canvas>
-            <canvas id="canvas" style="position:absolute"></canvas>
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.0/paper-full.min.js"></script>
+
+        <div class="container w-100 border p-0 mt-2" style="height: 80vh">
+            <canvas id="mCanvas" resize></canvas>
         </div>
-        <div id="rest">
-            <button onclick="clearStuffs()">Clear Shits</button>
-            <button onclick="listFourier()">
-                Calculate Fourier Coefficients
-            </button>
-            <button onclick="listFourierValues()">Fourier Values</button>
-            <label>
-                Animate Circles
-                <input
-                    type="checkbox"
-                    checked="false"
-                    id="checkBox"
-                    style="width:1.5vw; height:1.5vw"
-                />
-            </label>
-            <div class="slidecontainer">
-                <p>Precision</p>
-                <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value="100"
-                    id="slider"
-                    style="width:80vw"
-                />
-                <div id="cValue">n circles</div>
-                <p>Speed Multiplier</p>
-                <input
-                    type="range"
-                    min="1"
-                    max="1000"
-                    value="200"
-                    id="slider2"
-                    style="width:80vw"
-                />
-                <div id="sValue">w = 0.02</div>
-            </div>
-            <table id="table"></table>
-        </div>
+        <script type="text/paperscript" canvas="mCanvas" src="paperCanvas.js"></script>
+        <script>
+            function fitCanvas() {
+                $('#mCanvas').width($('.container').width())
+                $('#mCanvas').height($('.container').height())
+            }
+            fitCanvas()
+            window.onresize = fitCanvas;
+        </script>
+    </body>
+
+</html>
+<!--
         <script>
             var container = document.getElementById('container')
             var rest = document.getElementById('rest')
@@ -448,5 +429,4 @@
                         }</td><td>${pointArr[i].y}</td></tr>`
             }
         </script>
-    </body>
-</html>
+        -->
