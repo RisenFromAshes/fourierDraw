@@ -1,13 +1,12 @@
 var myPath;
 
 function onMouseDown(event) {
-    if (myPath) myPath.selected = false;
     myPath = new Path();
     myPath.strokeColor = 'black';
     myPath.strokeWidth = 4;
     myPath.strokeCap = 'round';
     myPath.add(event.point);
-    myPath.fullySelected = true;
+    //myPath.fullySelected = true;
 }
 
 function onMouseDrag(event) {
