@@ -83,21 +83,24 @@
             </form>
         </div>
         <script>
-            var fillColor = 'rgba(255,255,255,0)';
-            var strokeColor = 'rgba(0,0,0,1)';
-            var strokeWidth = 3;
-
             function fitCanvas() {
                 $('#mCanvas').width($('#canvasContainer').width())
                 $('#mCanvas').height($('#canvasContainer').height())
             }
             fitCanvas()
             window.onresize = fitCanvas;
+            var fillColor = 'rgba(255,255,255,0)';
+            var strokeColor = 'rgba(0,0,0,1)';
+            var strokeWidth = 3;
+            window.globals = {};
+            var myPath;
             var setFillColor = (color) => {
                 fillColor = (color.toRgbString())
+                if (myPath) window.globals.setFillColor(fillColor)
             }
             var setStrokeColor = (color) => {
                 strokeColor = (color.toRgbString())
+                if (myPath) window.globals.setStrokeColor(strokeColor)
             }
             $(document).ready(function () {
                 $("#fillColorPicker").spectrum({

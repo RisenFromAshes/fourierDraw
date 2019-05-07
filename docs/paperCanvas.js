@@ -1,5 +1,3 @@
-var myPath;
-
 function onMouseDown(event) {
     myPath = new Path();
     myPath.strokeColor = strokeColor;
@@ -16,4 +14,11 @@ function onMouseDrag(event) {
 function onMouseUp(event) {
     myPath.simplify(10)
     myPath.fillColor = fillColor
+}
+
+globals.setFillColor = function (color) {
+    if (myPath) myPath.fillColor = fillColor
+}
+globals.setStrokeColor = function (color) {
+    if (myPath) myPath.strokeColor = strokeColor
 }
