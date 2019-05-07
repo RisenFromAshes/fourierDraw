@@ -1,10 +1,12 @@
 function onMouseDown(event) {
+    if (myPath) myPath.fullySelected = false
     myPath = new Path();
     myPath.strokeColor = strokeColor;
     myPath.strokeWidth = strokeWidth;
+    myPath.fillColor = fillColor
     myPath.strokeCap = 'round';
     myPath.add(event.point);
-    //myPath.fullySelected = true;
+    myPath.selected = false;
 }
 
 function onMouseDrag(event) {
@@ -13,7 +15,7 @@ function onMouseDrag(event) {
 
 function onMouseUp(event) {
     myPath.simplify(10)
-    myPath.fillColor = fillColor
+    myPath.selected = true;
 }
 
 globals.setFillColor = function (color) {
