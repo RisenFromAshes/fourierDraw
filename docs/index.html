@@ -117,6 +117,7 @@
                 });
                 $('#strokeSlider').on('input', function (event) {
                     strokeWidth = this.value;
+                    window.globals.setStrokeWidth(this.value);
                     $('#strokeValue').text(`${this.value} px`)
                 })
             });
